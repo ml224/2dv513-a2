@@ -1,5 +1,7 @@
-obj
-data
-DotNetZip.zip
-bin
-DotNetZip
+.vagrant
+.vs
+node_modules
+data.bz2
+install-node.sh
+provision.sh
+Vagrantfile
