@@ -1,7 +1,6 @@
-.vagrant
-.vs
-node_modules
+.env
+composer.json
+composer.lock
+vendor
 data.bz2
-install-node.sh
-provision.sh
-Vagrantfile
+configDotEnv.php
