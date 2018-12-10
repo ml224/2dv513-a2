@@ -1,9 +1,11 @@
 <?php
 require_once('./src/model/author.php');
 require_once('./src/model/post.php');
+require_once('./src/model/subreddit.php');
 
 class Database_Seeder{
     private $db_author;
+    private $db_sureddit;
     private $db_post;
 
     function __construct(Reddit_database $db){
@@ -12,6 +14,7 @@ class Database_Seeder{
 
         $this->db_author = new Author($mysqli);
         $this->db_post = new Post($mysqli);
+        $this->db_subreddit = new Subreddit($mysqli);
     }
 
 
@@ -22,15 +25,12 @@ class Database_Seeder{
         if ($stream) {
             $count = 1;
 
-            while (($buffer = fgets($stream, 4096)) !== false && $count < 100) {
+            while (($buffer = fgets($stream, 4096)) !== null) {
                 $json = json_decode($buffer, true);
                 
                 $this->insert_author($json);
                 $this->insert_post($json);
-
-                
-                $subreddit = $json['subreddit'];
-                $subreddit_id = $json['subreddit_id'];
+                $this->insert_subreddit($json);
 
                 $count ++;
             }
@@ -56,5 +56,11 @@ class Database_Seeder{
 
         $this->db_post->insert_post($postValues);
     }
+
+    private function insert_subreddit(array $result){
+        $subreddit = $result['subreddit'];
+        $subreddit_id = $result['subreddit_id'];
+        $this->db_subreddit->insert_subreddit($subreddit, $subreddit_id);
+     }
 
 }

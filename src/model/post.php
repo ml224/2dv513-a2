@@ -12,13 +12,28 @@ class Post{
 
     public function insert_post(array $attributes){
         $this->setPostValues($attributes);
-        $query = "INSERT INTO post($this->postKeys) VALUES($this->postValues)";
         
-        if(!$this->mysqli->query($query))
+        $stmt = $this->mysqli->prepare("INSERT INTO post($this->postKeys) VALUES(?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssss", ...array_values($attributes));
+        
+        if(!$stmt->execute())
         {
             echo "Post did not get inserted.... \n";
             echo $this->mysqli->error . "\n";
         }
+            
+        
+        $stmt->close();
+
+
+
+/*
+        $query = "INSERT INTO post($this->postKeys) VALUES($this->postValues)";
+        
+        if(!$this->mysqli->query($query))
+        {
+            
+        }*/
    
     }
 

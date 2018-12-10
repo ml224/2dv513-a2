@@ -9,12 +9,16 @@ class Author{
     }
 
     public function insert_author(string $name){
-        $query = "INSERT INTO author(name) VALUES('$name')";
-        if(!$this->mysqli->query($query))
+        $stmt = $this->mysqli->prepare("INSERT INTO author(name) VALUES(?)");
+        $stmt->bind_param("s", $name);
+        
+        if(!$stmt->execute())
         {
-            echo "author did not update...\n";
+            echo "Author did not get inserted.... \n";
             echo $this->mysqli->error . "\n";
         }
+
+        $stmt->close();
     }
 
 }
