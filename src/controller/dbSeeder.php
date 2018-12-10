@@ -25,12 +25,12 @@ class Database_Seeder{
         if ($stream) {
             $count = 1;
 
-            while (($buffer = fgets($stream, 4096)) !== null) {
+            while (($buffer = fgets($stream, 4096)) !== null && $count < 3) {
                 $json = json_decode($buffer, true);
                 
-                $this->insert_author($json);
+                //$this->insert_author($json);
                 $this->insert_post($json);
-                $this->insert_subreddit($json);
+                //$this->insert_subreddit($json);
 
                 $count ++;
             }
@@ -47,7 +47,7 @@ class Database_Seeder{
 
     private function insert_post(array $result){
         $postValues = array(
-            'created_utc' => $result['created_utc'], 
+            'created_utc' => date("Y-m-d H-i-s", $result['created_utc']), 
             'id' => $result['id'], 
             'name' => $result['name'], 
             'body' => $result['body'], 
