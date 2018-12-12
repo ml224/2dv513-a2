@@ -1,4 +1,6 @@
 <?php
+ini_set("auto_detect_line_endings", TRUE);
+
 require_once('./src/model/author.php');
 require_once('./src/model/post.php');
 require_once('./src/model/subreddit.php');
@@ -18,24 +20,24 @@ class Database_Seeder{
     }
 
 
-    public function seed_db(){
-        $file = getenv('FILE_PATH');
-        $stream = bzopen($file, "r");
-    
-        if ($stream) {
-            $count = 1;
+    public function seed_db(string $file_path){
+        $handle = bzopen($file_path, "r");
+        if ($handle) {
+            $starttime = microtime();
+            while (($line = fgets($handle, 14000)) !== false) {
+                set_time_limit(20);
 
-            while (($buffer = fgets($stream, 4096)) !== null && $count < 3) {
-                $json = json_decode($buffer, true);
-                
-                //$this->insert_author($json);
+                $json = json_decode($line, true);
+            
+                $this->insert_author($json);
                 $this->insert_post($json);
-                //$this->insert_subreddit($json);
-
-                $count ++;
+                $this->insert_subreddit($json);
             }
 
-            fclose($stream);
+            $endtime = microtime();
+            echo "START TIME: $starttime\n";
+            echo "END TIME: $endtime\n";
+            fclose($handle);
         }
 
      }
