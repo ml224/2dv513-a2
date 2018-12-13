@@ -1,61 +1,52 @@
 <?php
+ini_set('max_execution_time', 0);
+
 
 class Post{
     private $mysqli;
-    private $postValues = "";
-    private $postKeys = "";
+    private $query = "";
+    private $keys = array();
 
     function __construct($mysqli)
     {
         $this->mysqli = $mysqli;
     }
 
-    public function insert_post(array $attributes){
-        $this->setPostValues($attributes);
-        
-        $stmt = $this->mysqli->prepare("INSERT INTO post($this->postKeys) VALUES(?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssss", ...array_values($attributes));
-        
-        if(!$stmt->execute())
-        {
-            echo "Post did not get inserted.... \n";
-            echo $this->mysqli->error . "\n";
+    public function executeQuery(){
+        $values = $this->getQuery();//$this->mysqli->real_escape_string($this->getQuery());
+        $query = "INSERT INTO post (created_utc, id, name, body, score) VALUES $values";
+
+        if(!$this->mysqli->query($query)){
+            throw new Exception("query did not work!!!\n" . $this->mysqli->error);
         }
-            
-        
-        $stmt->close();
 
-
-
-/*
-        $query = "INSERT INTO post($this->postKeys) VALUES($this->postValues)";
-        
-        if(!$this->mysqli->query($query))
-        {
-            
-        }*/
-   
+        $this->resetQuery();
     }
 
-    private function setPostValues(array $attributes){
-        $numItems = count($attributes);
+    public function addToQuery(array $row){
+        $numItems = count($row);
         $count = 1;
+        $values = "(";
 
-        $values = "";
-        $keys = "";
-        foreach($attributes as $key => $value){
-            $keys .= $key;
-            $values .= "'$value'";
-            
+        foreach($row as $key => $value){
+            $values .= "$key='$value'";
+
             if($count < $numItems){
-                $keys .= ", ";
                 $values .= ", ";
             }
             $count ++;
         }
-        
-        $this->postKeys = $keys;
-        $this->postValues = $values;
+        $values .= "), ";
+
+        $this->query .= $values;
+    }
+
+    private function resetQuery(){
+        $this->query = "";
+    }
+
+    private function getQuery(){
+        return substr($this->query, 0, -2);
     }
 
 }

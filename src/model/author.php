@@ -2,23 +2,34 @@
 
 class Author{
     private $mysqli;
-
+    private $query = "";
+    
     function __construct($mysqli)
     {
         $this->mysqli = $mysqli;
     }
 
-    public function insert_author(string $name){
-        $stmt = $this->mysqli->prepare("INSERT INTO author(name) VALUES(?)");
-        $stmt->bind_param("s", $name);
+    public function executeQuery(){
+        $values = $this->getQuery();
+        $query = "INSERT INTO author (name) VALUES $values";
         
-        if(!$stmt->execute())
-        {
-            echo "Author did not get inserted.... \n";
-            echo $this->mysqli->error . "\n";
+        if(!$this->mysqli->query($query)){
+            throw new Exception("query did not work!!!\n" . $this->mysqli->error);
         }
 
-        $stmt->close();
+        $this->resetQuery();
+    }
+
+    public function addToQuery(string $stmt){
+        $this->query .= "('$stmt'), ";
+    }
+
+    private function getQuery(){
+        return substr($this->query, 0, -2);
+    }
+
+    private function resetQuery(){
+        $this->query = "";
     }
 
 }
