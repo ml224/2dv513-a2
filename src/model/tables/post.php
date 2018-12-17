@@ -1,5 +1,4 @@
 <?php
-ini_set('max_execution_time', 0);
 
 
 class Post{
@@ -13,8 +12,9 @@ class Post{
     }
 
     public function executeQuery(){
-        $values = $this->getQuery();//$this->mysqli->real_escape_string($this->getQuery());
-        $query = "INSERT INTO post (created_utc, id, name, body, score) VALUES $values";
+        
+        $values = $this->getQuery();
+        $query = "INSERT INTO post (created_utc, subreddit_id, id, name, body, score, parent_id, link_id, author) VALUES $values";
 
         if(!$this->mysqli->query($query)){
             throw new Exception("query did not work!!!\n" . $this->mysqli->error);
@@ -26,17 +26,18 @@ class Post{
     public function addToQuery(array $row){
         $numItems = count($row);
         $count = 1;
-        $values = "(";
 
-        foreach($row as $key => $value){
-            $values .= "$key='$value'";
+        $created = $row['created_utc'];
+        $sub = $row['subreddit_id'];
+        $id = $row['id'];
+        $name = $row['name'];
+        $body = $this->mysqli->real_escape_string($row['body']);
+        $score = $row['score'];
+        $parentId = $row['parent_id'];
+        $linkId = $row['link_id'];
+        $author = $row['author'];
 
-            if($count < $numItems){
-                $values .= ", ";
-            }
-            $count ++;
-        }
-        $values .= "), ";
+        $values = "('$created', '$sub', '$id', '$name', '$body', '$score', '$parentId', '$linkId', '$author'), ";
 
         $this->query .= $values;
     }

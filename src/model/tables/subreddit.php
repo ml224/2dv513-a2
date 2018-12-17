@@ -1,9 +1,10 @@
 <?php
 
-class Author{
+class Subreddit{
     private $mysqli;
     private $query = "";
-    
+
+
     function __construct($mysqli)
     {
         $this->mysqli = $mysqli;
@@ -11,8 +12,8 @@ class Author{
 
     public function executeQuery(){
         $values = $this->getQuery();
-        $query = "INSERT INTO author (name) VALUES $values";
-        
+        $query = "INSERT IGNORE INTO subreddit (name, id) VALUES $values";
+
         if(!$this->mysqli->query($query)){
             throw new Exception("query did not work!!!\n" . $this->mysqli->error);
         }
@@ -20,17 +21,15 @@ class Author{
         $this->resetQuery();
     }
 
-    public function addToQuery(string $stmt){
-        $this->query .= "('$stmt'), ";
-    }
-
-    private function getQuery(){
-        return substr($this->query, 0, -2);
+    public function addToQuery(string $name, string $id){
+        $this->query .= "('$name', '$id'), ";
     }
 
     private function resetQuery(){
         $this->query = "";
     }
 
+    private function getQuery(){
+        return substr($this->query, 0, -2);
+    }
 }
-    
